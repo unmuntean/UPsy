@@ -65,3 +65,6 @@ node_modules/
 .env
 
 .idea
+upsy-client/.cache
+upsy-client/dist/*
+.vscode
