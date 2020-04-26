@@ -1,7 +1,7 @@
 const {db} = require('../util/admin');
 
 
-exports.getAllTests =(req, res) =>{
+exports.getAllTests = (req, res) =>{
     db
     .collection('tests')
     .get()

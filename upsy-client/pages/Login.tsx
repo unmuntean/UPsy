@@ -35,7 +35,7 @@ export default ({}) => {
     const classes = useStyles();
 
     const onSubmit = (data) => {
-        firebaseApi.login<User>().then(dispatchAsync("setUser"));
+        firebaseApi.login<User>({method: 'POST'}).then(dispatchAsync("setUser"));
         console.log(data);
     }
 

@@ -2,13 +2,31 @@ const { db } = require('../util/admin');
 
 const config = require('../util/config');
 
+// const config =  {
+//     apiKey: "AIzaSyAvQdRq_SlrES22U0KoXfleLNxP16yC06g",
+//     authDomain: "upsy-928f6.firebaseapp.com",
+//     databaseURL: "https://upsy-928f6.firebaseio.com",
+//     projectId: "upsy-928f6",
+//     storageBucket: "upsy-928f6.appspot.com",
+//     messagingSenderId: "1042948035824",
+//     appId: "1:1042948035824:web:0432e7682faf7a1bd21e35",
+//     measurementId: "G-QD1KVCEDC9"
+//   };
+
+
 const firebase = require('firebase');
 firebase.initializeApp(config)
 
-const {validateSignupData, validateLoginData} = require('../util/validators');
+const {validateSignupData, validateLoginData, Cors} = require('../util/validators');
 
 
 exports.signup =  (req, res) => {
+
+    if (Cors(req, res, 'POST')){
+        return;
+    }
+
+
     const newUser = {
         email: req.body.email,
         password: req.body.password,
@@ -60,29 +78,41 @@ exports.signup =  (req, res) => {
 }
 
 
+
 exports.login = (req, res) => {
+
+    if (Cors(req, res, 'POST')){
+        return;
+    }
+
     const user = {
-        email: req.body.email,
-        password: req.body.password
+      email: req.body.email,
+      password: req.body.password
     };
-
+  
     const { valid, errors } = validateLoginData(user);
-
-    if(!valid) return res.status(400).json(error);
-
-    firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-    .then(data => {
+  
+    if (!valid) return res.status(400).json(errors);
+  
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then((data) => {
         return data.user.getIdToken();
-    })
-    .then(token => {
+      })
+      .then((token) => {
         return res.json({ token });
-    })
-    .catch(err => {
+      })
+      .catch((err) => {
         console.error(err);
-        if(err.code === 'auth/wrong-password'){
-            return res.status(403).json({ general: 'wrong credentials, try again'})
-        } else {
-        return res.status(500).json({error: err.code})
-        }
-    })
-}
+        // auth/wrong-password
+        // auth/user-not-user
+        return res
+          .status(403)
+          .json({ general: "Wrong credentials, please try again" });
+      });
+  };
+
+
+
+

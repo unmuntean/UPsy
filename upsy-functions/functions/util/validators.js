@@ -40,3 +40,13 @@ exports.validateLoginData = (data) => {
         valid: Object.keys(errors).length === 0 ? true : false
     }
 }
+
+exports.Cors = (req, res, methods) => {
+    if (req.method === 'OPTIONS') {
+        res.set('Access-Control-Allow-Origin', '*')
+           .set('Access-Control-Allow-Methods', methods)
+           .status(200);
+           return true;
+    }
+    return false;
+}
