@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "target": "ES5",
+    "lib": [
+      "es2017", "dom", "es2019"
+    ],
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}
