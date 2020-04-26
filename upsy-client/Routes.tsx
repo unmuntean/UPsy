@@ -12,5 +12,8 @@ export default () => <Switch>
         <Route path="/login">
             <Login/>
         </Route>
+        <Route path="/">
+            <Login/>
+        </Route>
     </Route>
 </Switch>
