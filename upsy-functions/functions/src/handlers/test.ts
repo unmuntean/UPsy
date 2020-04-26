@@ -1,5 +1,9 @@
 import {FBAuth} from "../utils/auth";
 import {app, db} from "../utils/app";
+
+
+
+
 export const register = () => {
     app.get('/tests', FBAuth, (req, res) => {
         db
@@ -35,6 +39,26 @@ export const register = () => {
             })
             .catch(err => {
                 res.status(500).json({error: "something went wrong"});
+                console.error(err);
+            })
+    })
+
+    app.post('/result', FBAuth, (req, res) => {
+
+        const newResult = {
+            anxiety: req.body.anxiety,
+            stress: req.body.stress,
+            depression: req.body.depression
+        };
+
+        db
+            .collection('results')
+            .add(newResult)
+            .then(doc => {
+                res.json({ message: `Result ${doc.id} submitted successfully.`});
+            })
+            .catch(err =>{
+                res.status(500).json({error: "Something went wrong"});
                 console.error(err);
             })
     })
