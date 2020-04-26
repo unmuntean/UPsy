@@ -49,7 +49,7 @@ export const register = () => {
             anxiety: req.body.anxiety,
             stress: req.body.stress,
             depression: req.body.depression
-        }
+        };
 
         db
             .collection('results')
