@@ -2,9 +2,8 @@ import React, {useEffect} from "react";
 import {AppBar, IconButton, Toolbar, Typography} from "@material-ui/core";
 import {PhotoCamera,ExitToAppTwoTone} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
-import {login} from "../shared/user";
-import {useStore} from "../shared/store";
-
+import {useHistory} from 'react-router-dom';
+import {retrieveUserFromToken} from "../shared/user";
 const useStyles = makeStyles({
     sectionDesktop: {
         display: 'flex',
@@ -19,15 +18,9 @@ const useStyles = makeStyles({
 
 export default () => {
     const classes = useStyles();
-    const { state, dispatchAsync, dispatch } = useStore();
 
-    useEffect(() => {
-        dispatch({
-            type: "setUser",
-            payload: { email: "" }
-        })
-    }, [])
-
+    const history = useHistory();
+    retrieveUserFromToken();
 
     return <AppBar position="relative">
         <Toolbar>
@@ -37,7 +30,7 @@ export default () => {
             </Typography>
             <div className={classes.grow}/>
             <div className={classes.sectionDesktop}>
-                <IconButton edge="end" color="inherit" onClick={() => login("garovat.adrian@gmail.com", "12345678").then(dispatchAsync("setUser"))}>
+                <IconButton edge="end" color="inherit" onClick={() => history.push({pathname: "/login"})}>
                     <ExitToAppTwoTone/>
                 </IconButton>
             </div>

@@ -1,5 +1,7 @@
 import {ExtensibleFunction} from "./utils";
 import merge from 'lodash.merge';
+import {useStore} from "./store";
+import {TokenStorage} from "./token";
 
 export type Filters = Mapping;
 
@@ -8,9 +10,10 @@ type ApiFactoryRequestInfo = {
 } & RequestInit
 
 class ApiFactoryBase extends ExtensibleFunction {
-    constructor(public path: string, public baseRequestInfo: RequestInit) {
+    constructor(public path: string, public baseRequestInfo: RequestInit | (() => RequestInit)) {
         super((reqInfo: ApiFactoryRequestInfo = {}) => {
-            reqInfo = merge({}, baseRequestInfo, reqInfo)
+            const baseRequestInfoHere = baseRequestInfo instanceof Function ? baseRequestInfo() : baseRequestInfo;
+            reqInfo = merge({}, baseRequestInfoHere, reqInfo)
             const searchParams = new URLSearchParams();
             Object.keys(reqInfo.query || {}).forEach(key => searchParams.append(key, reqInfo.query[key]));
             const url = path + (searchParams.toString() != "" ? '?' + searchParams.toString() : "");
@@ -81,7 +84,7 @@ export type ApiFactory = ApiFactoryBase & MissingKeyApiFactory & {
 interface MissingKeyApiFactory extends Mapping<ApiFactory> {
 }
 
-export function apiFactory(path: string, baseRequestInfo: RequestInit = {}): ApiFactory {
+export function apiFactory(path: string, baseRequestInfo: RequestInit | (() => RequestInit) = {}): ApiFactory {
     return new Proxy(new ApiFactoryBase(path, baseRequestInfo), {
         get(target: ApiFactoryBase, p: string | number, receiver: any): any {
             if (p in target && ["GET", "POST", "PUT", "PATCH", "DELETE"].includes(p as any)) return target[p];
@@ -90,6 +93,12 @@ export function apiFactory(path: string, baseRequestInfo: RequestInit = {}): Api
     }) as ApiFactory;
 }
 
-export const firebaseApi = apiFactory("http://localhost:5001/upsy-928f6/europe-west3/api/", {
-    mode: "cors"
+export const firebaseApi = apiFactory("http://localhost:5001/upsy-928f6/europe-west3/api/", () => {
+    const token = TokenStorage.getToken();
+    return {
+        mode: "cors",
+        headers: token ? {
+            Authorization: "Bearer " + token
+        } : {}
+    }
 });

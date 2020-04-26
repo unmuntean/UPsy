@@ -1,7 +1,7 @@
 import {FBAuth} from "../utils/auth";
 import {app, db} from "../utils/app";
 export const register = () => {
-    app.get('/tests', (req, res) => {
+    app.get('/tests', FBAuth, (req, res) => {
         db
             .collection('tests')
             .get()
