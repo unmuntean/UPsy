@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ES5",
+    "lib": [
+      "es2017", "es2019"
+    ],
+    "module": "commonjs",
+    "outDir": "./lib",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+  },
+  "include": [
+    "./src/*"
+  ],
+  "exclude": [
+//    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

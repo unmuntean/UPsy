@@ -68,3 +68,4 @@ node_modules/
 upsy-client/.cache
 upsy-client/dist/*
 .vscode
+upsy-functions/functions/lib

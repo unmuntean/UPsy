@@ -3,7 +3,7 @@ import {Button, Card, CardContent, TextField, Typography} from "@material-ui/cor
 import {FormContext, useForm} from 'react-hook-form'
 import {makeStyles} from "@material-ui/core/styles";
 import {RHFInput} from 'react-hook-form-input';
-import {emailRegex, User} from "../shared/user";
+import {emailRegex, login, User} from "../shared/user";
 import {firebaseApi} from "../shared/api";
 import {useStore} from "../shared/store";
 
@@ -34,17 +34,12 @@ export default ({}) => {
 
     const classes = useStyles();
 
-    const onSubmit = (data) => {
-        firebaseApi.login<User>({method: 'POST'}).then(dispatchAsync("setUser"));
-        console.log(data);
-    }
-
 
     return <Card className={classes.card}>
         <CardContent>
             <Typography variant="h2" color="inherit" noWrap>Login</Typography>
             <FormContext {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)} className={classes.form}>
+                <form onSubmit={methods.handleSubmit(login.then(dispatchAsync("setUser")))} className={classes.form}>
                     <RHFInput
                         name="email"
                         defaultValue=""
