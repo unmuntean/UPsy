@@ -3,9 +3,7 @@ const admin = require('firebase-admin');
 
 const app = require('express')();
 
-const cors = require('cors')({
-    origin: true,
-  })
+const cors = require('cors');
 
 admin.initializeApp();
 
@@ -24,7 +22,6 @@ const firebase = require('firebase');
 firebase.initializeApp(config);
 
 const db = admin.firestore();
-
 
 app.get('/tests', (req, res) =>{
     db
@@ -165,11 +162,10 @@ app.post('/signup', (req, res) => {
 });
 
 
-app.post('/login', (req, res) => {
+app.post('/login', cors(), (req, res) => {
     const user = {
         email: req.body.email,
-        password: req.body.password,
-
+        password: req.body.password
     };
     
     let errors = {};
@@ -178,22 +174,20 @@ app.post('/login', (req, res) => {
 
     if(Object.keys(errors).length > 0) return res.status(400).json(errors);
 
-    return cors(req, res, () => {
-        firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-        .then(data => {
-            return data.user.getIdToken();
-        })
-        .then(token => {
-            return res.json({ token });
-        })
-        .catch(err => {
-            console.error(err);
-            if(err.code === 'auth/wrong-password'){
-                return res.status(403).json({ general: 'wrong credentials, try again'})
-            } else {
-            return res.status(500).json({error: err.code})
-            }
-        })
+    firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+    .then(data => {
+        return data.user.getIdToken();
+    })
+    .then(token => {
+        return res.json({ token });
+    })
+    .catch(err => {
+        console.error(err);
+        if(err.code === 'auth/wrong-password'){
+            return res.status(403).json({ general: 'wrong credentials, try again'})
+        } else {
+        return res.status(500).json({error: err.code})
+        }
     })
 })
 
