@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Button, Card, CardContent, TextField, Typography} from "@material-ui/core";
-import {FormContext, useForm} from 'react-hook-form'
+import {Controller, FormContext, useForm} from 'react-hook-form'
 import {makeStyles} from "@material-ui/core/styles";
 import {RHFInput} from 'react-hook-form-input';
 import {emailRegex, login, User} from "../shared/user";
@@ -26,6 +26,8 @@ const useStyles = makeStyles({
 });
 
 
+
+
 export default ({}) => {
     const {dispatchAsync} = useStore();
     const methods = useForm<{
@@ -40,18 +42,18 @@ export default ({}) => {
             <Typography variant="h2" color="inherit" noWrap>Login</Typography>
             <FormContext {...methods}>
                 <form onSubmit={methods.handleSubmit(login.then(dispatchAsync("setUser")))} className={classes.form}>
-                    <RHFInput
+                    <Controller
                         name="email"
                         defaultValue=""
                         rules={{
-                            required: true,
+                            required: "This field is required",
                             pattern: {
                                 value: emailRegex,
                                 message: "The field's value is not a valid email."
                             }
                         }}
                         as={<TextField label="Email" variant="filled" fullWidth className={classes.field}
-                                       helperText={methods.errors?.email?.type == 'required' ? "This field is required" : methods.errors?.email?.message}
+                                       helperText={methods.errors?.email?.message}
                                        error={methods.errors.email != null}/>}/>
                     <RHFInput
                         name="password"
