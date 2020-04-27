@@ -93,7 +93,7 @@ export function apiFactory(path: string, baseRequestInfo: RequestInit | (() => R
     }) as ApiFactory;
 }
 
-export const firebaseApi = apiFactory("http://localhost:5001/upsy-928f6/europe-west3/api/", () => {
+export const firebaseApi = apiFactory("https://europe-west3-upsy-928f6.cloudfunctions.net/api/", () => {
     const token = TokenStorage.getToken();
     return {
         mode: "cors",
