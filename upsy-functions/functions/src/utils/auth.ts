@@ -2,10 +2,11 @@ import admin from "firebase-admin";
 import {db} from "./app";
 
 interface User {
-    handle: string,
-    email: string,
-    createdAT: string,
-    userId: string
+    handle: string;
+    email: string;
+    createdAT: string;
+    userId: string;
+    uid: string;
 }
 declare global {
     namespace Express {

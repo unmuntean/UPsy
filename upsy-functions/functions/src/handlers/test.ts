@@ -2,40 +2,40 @@ import {FBAuth} from "../utils/auth";
 import {app, db} from "../utils/app";
 
 
-
-
 export const register = () => {
-    app.get('/tests', FBAuth, (req, res) => {
-        db
-            .collection('tests')
-            .get()
-            .then(data => {
-                let tests = [];
-                data.forEach(doc => {
-                    tests.push({
-                        ...doc.data()
-                    });
-                });
-                return res.json(tests);
-            })
-            .catch(err => console.error(err));
-    })
-
-
+    const anxietyTests = [2, 4, 7, 10, 15, 17, 20];
+    const depressionTests = [3, 5, 9, 13, 16, 19, 21];
+    const stressTests = [1, 6, 8, 11, 12, 14, 18];
 // post one test
-    app.post('/test', FBAuth, (req, res) => {
+    app.post<any, any, Record<string, string>>('/test', FBAuth, async (req, res) => {
+        const stressScore = stressTests.reduce((s, c) => s + Number.parseInt(req.body[String(c)]), 0);
+        const anxietyScore = anxietyTests.reduce((s, c) => s + Number.parseInt(req.body[String(c)]), 0);
+        const depressionScore = depressionTests.reduce((s, c) => s + Number.parseInt(req.body[String(c)]), 0);
 
         const newTest = {
-            body: req.body.body,
-            userHandle: req.user.handle,
-            createdAT: new Date().toISOString()
+            userId: req.user.uid,
+            questions: req.body,
+            scores: {
+                anxiety: anxietyScore,
+                stress: stressScore,
+                depression: depressionScore
+            }
         };
+
+        if ((await db
+            .collection('tests')
+            .where("userId", '==', req.user.uid)
+            .get()).size > 0) {
+            res.status(500).json({error: `User ${req.user.uid} already did a test.`})
+        }
 
         db
             .collection('tests')
             .add(newTest)
             .then(doc => {
-                res.json({message: `Test ${doc.id} created succesfully`});
+                return doc.get().then(test => {
+                    res.status(201).json(test.data());
+                })
             })
             .catch(err => {
                 res.status(500).json({error: "something went wrong"});
@@ -43,23 +43,18 @@ export const register = () => {
             })
     })
 
-    app.post('/result', FBAuth, (req, res) => {
+    app.get<{userId: string}>('/test/:userId', FBAuth, async (req, res) => {
+        const userId = req.params.userId;
 
-        const newResult = {
-            anxiety: req.body.anxiety,
-            stress: req.body.stress,
-            depression: req.body.depression
-        };
+        const qs = await db
+            .collection('tests')
+            .where("userId", '==', userId)
+            .get();
 
-        db
-            .collection('results')
-            .add(newResult)
-            .then(doc => {
-                res.json({ message: `Result ${doc.id} submitted successfully.`});
-            })
-            .catch(err =>{
-                res.status(500).json({error: "Something went wrong"});
-                console.error(err);
-            })
+        if (qs.size == 1) {
+            res.status(200).json(qs.docs[0].data());
+        } else {
+            res.status(500).json({error: `Could not find test result for user ${userId}`})
+        }
     })
 }
